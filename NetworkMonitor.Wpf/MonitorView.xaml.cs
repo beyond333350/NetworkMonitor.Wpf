@@ -78,6 +78,9 @@ namespace NetworkMonitor.Wpf
         {
             LoadTargets();
             InitChart();
+            TxtNodeCount.Text = _targetIps.Count.ToString();
+            TxtMonitorStatus.Text = "运行中";
+            TxtMonitorStatus.Foreground = (Brush)FindResource("BrushSuccess");
 
             BtnStart.IsEnabled = false;
             BtnStop.IsEnabled = true;
@@ -104,6 +107,8 @@ namespace NetworkMonitor.Wpf
             _cts?.Cancel();
             BtnStart.IsEnabled = true;
             BtnStop.IsEnabled = false;
+            TxtMonitorStatus.Text = "已停止";
+            TxtMonitorStatus.Foreground = (Brush)FindResource("BrushWarning");
         }
 
         private async Task PingAndUpdateAsync(string target, CancellationToken token)

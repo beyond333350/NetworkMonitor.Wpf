@@ -6,11 +6,12 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
+    <AssemblyGuid>CC92460B-D91D-4CAF-9E42-05BD43A798FD</AssemblyGuid>
+    <ApplicationIcon>Assets\logo.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="Fonts\Alibaba.ttf" />
-    <None Remove="Fonts\JetBrainsMono.ttf" />
+    <Content Include="Assets\logo.ico" />
   </ItemGroup>
 
   <ItemGroup>
@@ -18,11 +19,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Resource Include="Fonts\Alibaba.ttf" />
-    <Resource Include="Fonts\JetBrainsMono.ttf" />
-  </ItemGroup>
-
-  <ItemGroup>
+    <None Update="cygwin1.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="ip.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

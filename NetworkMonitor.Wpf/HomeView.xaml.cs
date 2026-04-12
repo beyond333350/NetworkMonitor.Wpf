@@ -4,21 +4,30 @@ using System.Diagnostics;
 using System.IO;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media; // 【新增】用于动态控制UI颜色
+using LiveCharts;
+using LiveCharts.Wpf;
 using Microsoft.Win32;
 
 namespace NetworkMonitor.Wpf
 {
     public partial class HomeView : UserControl
     {
+        public ChartValues<double> UploadBandwidthValues { get; set; } = new ChartValues<double>();
+        public ChartValues<double> DownloadBandwidthValues { get; set; } = new ChartValues<double>();
+        public ChartValues<string> ChartLabels { get; set; } = new ChartValues<string>();
+
         private bool _isRunning = false;
         private Random _randomPortGenerator = new Random();
 
         public HomeView()
         {
             InitializeComponent();
+            DataContext = this;
             LoadDefaultServer();
             LoadIpList();
         }
@@ -223,6 +232,29 @@ namespace NetworkMonitor.Wpf
         {
             _isRunning = true;
             SetButtonsState(false);
+
+            ChartValues<double> activeSeries = null;
+            TextBlock activeLossText = null;
+
+            if (!isUdpLossTest && !isDownload) activeSeries = UploadBandwidthValues;
+            else if (!isUdpLossTest && isDownload) activeSeries = DownloadBandwidthValues;
+            else if (isUdpLossTest && !isDownload) activeLossText = TxtUploadLoss;
+            else if (isUdpLossTest && isDownload) activeLossText = TxtDownloadLoss;
+
+            Dispatcher.Invoke(() => {
+                if (activeSeries != null)
+                {
+                    activeSeries.Clear();
+                    activeSeries.Add(0);
+                    if (ChartLabels.Count == 0) ChartLabels.Add("0");
+                }
+                if (activeLossText != null)
+                {
+                    activeLossText.Text = "测算中...";
+                    activeLossText.Foreground = Brushes.Gray; // 【修改】测算过程中文字变为灰色，防止视觉干扰
+                }
+            });
+
             string ip = GetTargetIp();
             int randomPort = _randomPortGenerator.Next(9200, 9241);
             string targetBandwidth = TxtTargetBandwidth.Text.Trim().ToUpper().Replace("M", "");
@@ -242,7 +274,63 @@ namespace NetworkMonitor.Wpf
                     ProcessStartInfo psi = new ProcessStartInfo { FileName = "iperf3.exe", Arguments = args, UseShellExecute = false, RedirectStandardOutput = true, RedirectStandardError = true, CreateNoWindow = true };
                     using (Process process = new Process { StartInfo = psi })
                     {
-                        process.OutputDataReceived += (s, ev) => { if (!string.IsNullOrWhiteSpace(ev.Data)) Dispatcher.Invoke(() => AppendLog(ev.Data)); };
+                        process.OutputDataReceived += (s, ev) => {
+                            if (!string.IsNullOrWhiteSpace(ev.Data))
+                            {
+                                Dispatcher.Invoke(() => {
+                                    AppendLog(ev.Data);
+
+                                    if (isUdpLossTest)
+                                    {
+                                        string[] lines = ev.Data.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+                                        foreach (var line in lines)
+                                        {
+                                            var match = Regex.Match(line, @"([0-9]+(?:[\.,][0-9]+)?)\s*%");
+                                            if (match.Success)
+                                            {
+                                                string lossValStr = match.Groups[1].Value;
+
+                                                // 【核心逻辑】将提取出的字符串转换为数字，用于颜色判断
+                                                if (double.TryParse(lossValStr.Replace(",", "."), System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out double lossNum))
+                                                {
+                                                    // 丢包率 < 1% 为绿色，>= 1% 为红色
+                                                    SolidColorBrush dynamicColor = lossNum < 1.0
+                                                        ? new SolidColorBrush((Color)ColorConverter.ConvertFromString("#4ADE80"))
+                                                        : new SolidColorBrush((Color)ColorConverter.ConvertFromString("#EF4444"));
+
+                                                    if (line.Contains("receiver") || line.Contains("Receiver"))
+                                                    {
+                                                        activeLossText.Text = lossValStr + " %";
+                                                        activeLossText.Foreground = dynamicColor;
+                                                    }
+                                                    else if (activeLossText.Text == "测算中...")
+                                                    {
+                                                        activeLossText.Text = lossValStr + " %";
+                                                        activeLossText.Foreground = dynamicColor;
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                    else
+                                    {
+                                        // 带宽图表逻辑保持不变
+                                        if (!ev.Data.Contains("sender") && !ev.Data.Contains("receiver"))
+                                        {
+                                            var match = Regex.Match(ev.Data, @"([0-9.]+)\s+Mbits/sec");
+                                            if (match.Success && double.TryParse(match.Groups[1].Value, out double speed))
+                                            {
+                                                activeSeries.Add(speed);
+                                                if (activeSeries.Count > ChartLabels.Count)
+                                                {
+                                                    ChartLabels.Add((ChartLabels.Count).ToString());
+                                                }
+                                            }
+                                        }
+                                    }
+                                });
+                            }
+                        };
                         process.ErrorDataReceived += (s, ev) => { if (!string.IsNullOrWhiteSpace(ev.Data)) Dispatcher.Invoke(() => AppendLog($"[报错] {ev.Data}")); };
                         process.Start();
                         process.BeginOutputReadLine();
@@ -259,7 +347,17 @@ namespace NetworkMonitor.Wpf
         {
             if (_isRunning) return;
             TxtLogOutput.Text = "";
-            AppendLog(">>> 日志已清空...");
+            UploadBandwidthValues.Clear();
+            DownloadBandwidthValues.Clear();
+            ChartLabels.Clear();
+
+            // 【修改】清空时恢复为白色/亮灰色默认态
+            TxtUploadLoss.Text = "-- %";
+            TxtUploadLoss.Foreground = Brushes.White;
+            TxtDownloadLoss.Text = "-- %";
+            TxtDownloadLoss.Foreground = Brushes.White;
+
+            AppendLog(">>> 日志与图表已清空...");
         }
 
         private void SetButtonsState(bool state)

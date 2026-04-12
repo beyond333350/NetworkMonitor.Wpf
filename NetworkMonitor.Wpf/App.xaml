@@ -11,6 +11,13 @@
         <SolidColorBrush x:Key="BrushBorder" Color="#E2E8F0"/>
         <SolidColorBrush x:Key="BrushAccent" Color="#4F46E5"/>
         <SolidColorBrush x:Key="BrushAccentHover" Color="#4338CA"/>
+        <SolidColorBrush x:Key="BrushNavBackground" Color="#334155"/>
+        <SolidColorBrush x:Key="BrushNavText" Color="#CBD5E1"/>
+        <SolidColorBrush x:Key="BrushNavItemHover" Color="#3F4F63"/>
+        <SolidColorBrush x:Key="BrushNavItemActive" Color="#475569"/>
+        <SolidColorBrush x:Key="BrushSuccess" Color="#16A34A"/>
+        <SolidColorBrush x:Key="BrushWarning" Color="#D97706"/>
+        <SolidColorBrush x:Key="BrushDanger" Color="#DC2626"/>
 
         <CornerRadius x:Key="Radius">8</CornerRadius>
         <DropShadowEffect x:Key="ShadowCard" BlurRadius="15" Direction="270" RenderingBias="Quality" ShadowDepth="2" Opacity="0.08"/>

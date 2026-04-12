@@ -1,6 +1,7 @@
 ﻿<UserControl x:Class="NetworkMonitor.Wpf.HomeView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:lvc="clr-namespace:LiveCharts.Wpf;assembly=LiveCharts.Wpf"
              Background="Transparent">
 
     <Grid Margin="5">
@@ -11,16 +12,83 @@
         </Grid.ColumnDefinitions>
 
         <Border Grid.Column="0" Margin="5" Background="{DynamicResource BrushControlBackground}" CornerRadius="8" Padding="8" BorderBrush="{DynamicResource BrushBorder}" BorderThickness="1">
-            <TextBox x:Name="TxtLogOutput" 
-                     Background="Transparent" 
-                     Foreground="{DynamicResource BrushForeground}" 
-                     BorderThickness="0" 
-                     FontSize="14" 
-                     IsReadOnly="True" 
-                     TextWrapping="Wrap" 
-                     AcceptsReturn="True" 
-                     VerticalScrollBarVisibility="Auto" 
-                     Text=""/>
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="3*"/>
+                    <RowDefinition Height="5*"/>
+                </Grid.RowDefinitions>
+
+                <Grid Grid.Row="0" Margin="0,0,0,10">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <TextBlock Grid.Row="0" Text="📈 实时测试数据分析" FontSize="14" FontWeight="SemiBold" Foreground="{DynamicResource BrushForeground}" Margin="0,0,0,5"/>
+
+                    <lvc:CartesianChart Grid.Row="1" DisableAnimations="True" LegendLocation="Top" Margin="0,0,0,5">
+                        <lvc:CartesianChart.Series>
+                            <lvc:LineSeries Values="{Binding UploadBandwidthValues}" Title="上传带宽" Stroke="#38BDF8" StrokeThickness="2" PointGeometrySize="8" DataLabels="True">
+                                <lvc:LineSeries.Fill>
+                                    <SolidColorBrush Color="Transparent"/>
+                                </lvc:LineSeries.Fill>
+                            </lvc:LineSeries>
+                            <lvc:LineSeries Values="{Binding DownloadBandwidthValues}" Title="下载带宽" Stroke="#EF4444" StrokeThickness="2" PointGeometrySize="8" DataLabels="True">
+                                <lvc:LineSeries.Fill>
+                                    <SolidColorBrush Color="Transparent"/>
+                                </lvc:LineSeries.Fill>
+                            </lvc:LineSeries>
+                        </lvc:CartesianChart.Series>
+                        <lvc:CartesianChart.AxisX>
+                            <lvc:Axis Title="时间 (s)" Labels="{Binding ChartLabels}" MinValue="0" Foreground="{DynamicResource BrushForeground}"/>
+                        </lvc:CartesianChart.AxisX>
+                        <lvc:CartesianChart.AxisY>
+                            <lvc:Axis Title="速率 (Mbps)" MinValue="0" Foreground="{DynamicResource BrushForeground}"/>
+                        </lvc:CartesianChart.AxisY>
+                    </lvc:CartesianChart>
+
+                    <Border Grid.Row="2" Height="1" Background="{DynamicResource BrushBorder}" Margin="0,5,0,10"/>
+
+                    <Grid Grid.Row="3" Margin="0,0,0,5">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="15"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <Border Grid.Column="0" Background="Transparent" CornerRadius="8" BorderBrush="{DynamicResource BrushBorder}" BorderThickness="1" Padding="15">
+                            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                                <TextBlock Text="上传丢包率" Foreground="{DynamicResource BrushForeground}" FontSize="15" Margin="0,0,0,5" HorizontalAlignment="Center" FontWeight="SemiBold"/>
+                                <TextBlock x:Name="TxtUploadLoss" Text="-- %" Foreground="#EF4444" FontSize="36" FontWeight="Black" HorizontalAlignment="Center"/>
+                            </StackPanel>
+                        </Border>
+
+                        <Border Grid.Column="2" Background="Transparent" CornerRadius="8" BorderBrush="{DynamicResource BrushBorder}" BorderThickness="1" Padding="15">
+                            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                                <TextBlock Text="下载丢包率" Foreground="{DynamicResource BrushForeground}" FontSize="15" Margin="0,0,0,5" HorizontalAlignment="Center" FontWeight="SemiBold"/>
+                                <TextBlock x:Name="TxtDownloadLoss" Text="-- %" Foreground="#F59E0B" FontSize="36" FontWeight="Black" HorizontalAlignment="Center"/>
+                            </StackPanel>
+                        </Border>
+                    </Grid>
+                </Grid>
+
+                <Border Grid.Row="1" Height="1" VerticalAlignment="Top" Background="{DynamicResource BrushBorder}" Margin="0,0,0,10"/>
+
+                <TextBox x:Name="TxtLogOutput" 
+                         Grid.Row="1"
+                         Margin="0,15,0,0"
+                         Background="Transparent" 
+                         Foreground="{DynamicResource BrushForeground}" 
+                         BorderThickness="0" 
+                         FontSize="14" 
+                         IsReadOnly="True" 
+                         TextWrapping="Wrap" 
+                         AcceptsReturn="True" 
+                         VerticalScrollBarVisibility="Auto" 
+                         Text=""/>
+            </Grid>
         </Border>
 
         <Grid Grid.Column="2">
@@ -35,7 +103,7 @@
                     <Button x:Name="BtnDownloadTest" Content="下载带宽测试" Width="140" Height="40" Click="BtnDownloadTest_Click"/>
                 </StackPanel>
 
-                <Border Margin="5" Background="{DynamicResource BrushBackground}" CornerRadius="6" Padding="5">
+                <Border Margin="5" Background="{DynamicResource BrushBackground}" BorderBrush="#D1D5DB" BorderThickness="1" CornerRadius="6" Padding="5">
                     <TextBox x:Name="TxtTargetBandwidth" Text="50" BorderThickness="0" Background="Transparent" Foreground="{DynamicResource BrushForeground}" VerticalAlignment="Center" FontSize="13"/>
                 </Border>
                 <TextBlock Text="请输入测试带宽(Mbps)" FontSize="10" Foreground="#666" Margin="10,0,0,15"/>
@@ -50,7 +118,7 @@
                     <Button x:Name="BtnUstcTest" Content="中科大测速" Width="140" Height="40" Click="BtnUstcTest_Click"/>
                 </StackPanel>
 
-                <Border Margin="5" Background="{DynamicResource BrushBackground}" CornerRadius="6" Padding="5">
+                <Border Margin="5" Background="{DynamicResource BrushBackground}" BorderBrush="#D1D5DB" BorderThickness="1" CornerRadius="6" Padding="5">
                     <ComboBox x:Name="CmbIpList" BorderThickness="0" Background="Transparent" Foreground="{DynamicResource BrushForeground}" VerticalAlignment="Center" FontSize="13" IsEditable="True"/>
                 </Border>
                 <StackPanel Orientation="Horizontal" Margin="0,5,0,20">
@@ -69,7 +137,7 @@
 
             <StackPanel Grid.Row="1" Orientation="Vertical" VerticalAlignment="Bottom" Margin="0,0,0,5">
                 <TextBlock Text="服务器地址" Foreground="Gray" Margin="5,0,0,0"/>
-                <Border Margin="5" Background="{DynamicResource BrushBackground}" CornerRadius="6" Padding="5">
+                <Border Margin="5" Background="{DynamicResource BrushBackground}" BorderBrush="#D1D5DB" BorderThickness="1" CornerRadius="6" Padding="5">
                     <ComboBox x:Name="CmbServerAddr" BorderThickness="0" Background="Transparent" Foreground="{DynamicResource BrushForeground}" VerticalAlignment="Center" FontSize="13" IsEditable="True"/>
                 </Border>
             </StackPanel>

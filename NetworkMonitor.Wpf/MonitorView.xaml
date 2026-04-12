@@ -5,7 +5,7 @@
              Background="Transparent">
 
     <Grid Margin="5">
-        <Border Background="{DynamicResource BrushControlBackground}" CornerRadius="8" Padding="20">
+        <Border Background="{DynamicResource BrushControlBackground}" CornerRadius="8" Padding="16" BorderBrush="{DynamicResource BrushBorder}" BorderThickness="1">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
@@ -13,21 +13,45 @@
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
 
-                <TextBlock Grid.Row="0" Text="📈 多节点 TCPING 实时延迟监控" FontSize="22" FontWeight="Bold" Foreground="{DynamicResource BrushForeground}" Margin="0,0,0,15"/>
-
-                <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,0,0,20">
-                    <Button x:Name="BtnStart" Content="▶ 开始多节点监控" Width="160" Height="35" Margin="0,0,15,0" Click="BtnStart_Click"/>
-                    <Button x:Name="BtnStop" Content="⏹ 停止监控" Width="140" Height="35" IsEnabled="False" Click="BtnStop_Click"/>
+                <StackPanel Grid.Row="0" Margin="0,0,0,14">
+                    <TextBlock Text="📈 多节点 TCPING 实时延迟监控" FontSize="22" FontWeight="Bold" Foreground="{DynamicResource BrushForeground}"/>
+                    <TextBlock Text="用于持续观察不同目标节点的连接延迟变化" FontSize="12" Foreground="{DynamicResource BrushSubText}" Margin="0,4,0,0"/>
                 </StackPanel>
 
-                <lvc:CartesianChart Grid.Row="2" x:Name="SpeedChart" Hoverable="True" LegendLocation="Right">
-                    <lvc:CartesianChart.AxisX>
-                        <lvc:Axis Title="时间 (秒)"></lvc:Axis>
-                    </lvc:CartesianChart.AxisX>
-                    <lvc:CartesianChart.AxisY>
-                        <lvc:Axis Title="延迟 (ms)" MinValue="0" LabelFormatter="{Binding YFormatter}"></lvc:Axis>
-                    </lvc:CartesianChart.AxisY>
-                </lvc:CartesianChart>
+                <Grid Grid.Row="1" Margin="0,0,0,14">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="12"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel Grid.Column="0" Orientation="Horizontal">
+                        <Button x:Name="BtnStart" Content="▶ 开始多节点监控" Width="170" Height="35" Margin="0,0,10,0" Click="BtnStart_Click"/>
+                        <Button x:Name="BtnStop" Content="⏹ 停止监控" Width="130" Height="35" IsEnabled="False" Click="BtnStop_Click"/>
+                    </StackPanel>
+
+                    <Border Grid.Column="2" Background="{DynamicResource BrushBackground}" BorderBrush="{DynamicResource BrushBorder}" BorderThickness="1" CornerRadius="6" Padding="10,6" VerticalAlignment="Center">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="状态：" FontSize="12" Foreground="{DynamicResource BrushSubText}" VerticalAlignment="Center"/>
+                            <TextBlock x:Name="TxtMonitorStatus" Text="未运行" FontSize="12" Foreground="{DynamicResource BrushWarning}" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                            <TextBlock Text="   节点：" FontSize="12" Foreground="{DynamicResource BrushSubText}" VerticalAlignment="Center" Margin="10,0,0,0"/>
+                            <TextBlock x:Name="TxtNodeCount" Text="0" FontSize="12" Foreground="{DynamicResource BrushForeground}" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                            <TextBlock Text="   采样间隔：1s" FontSize="12" Foreground="{DynamicResource BrushSubText}" VerticalAlignment="Center" Margin="10,0,0,0"/>
+                        </StackPanel>
+                    </Border>
+                </Grid>
+
+                <Border Grid.Row="2" Background="{DynamicResource BrushBackground}" BorderBrush="{DynamicResource BrushBorder}" BorderThickness="1" CornerRadius="8" Padding="10">
+                    <lvc:CartesianChart x:Name="SpeedChart" Hoverable="True" LegendLocation="Right">
+                        <lvc:CartesianChart.AxisX>
+                            <lvc:Axis Title="时间 (秒)"></lvc:Axis>
+                        </lvc:CartesianChart.AxisX>
+                        <lvc:CartesianChart.AxisY>
+                            <lvc:Axis Title="延迟 (ms)" MinValue="0" LabelFormatter="{Binding YFormatter}"></lvc:Axis>
+                        </lvc:CartesianChart.AxisY>
+                    </lvc:CartesianChart>
+                </Border>
 
             </Grid>
         </Border>
