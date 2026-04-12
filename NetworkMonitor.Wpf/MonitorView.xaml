@@ -1,0 +1,35 @@
+﻿<UserControl x:Class="NetworkMonitor.Wpf.MonitorView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:lvc="clr-namespace:LiveCharts.Wpf;assembly=LiveCharts.Wpf"
+             Background="Transparent">
+
+    <Grid Margin="5">
+        <Border Background="{DynamicResource BrushControlBackground}" CornerRadius="8" Padding="20">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <TextBlock Grid.Row="0" Text="📈 多节点 TCPING 实时延迟监控" FontSize="22" FontWeight="Bold" Foreground="{DynamicResource BrushForeground}" Margin="0,0,0,15"/>
+
+                <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,0,0,20">
+                    <Button x:Name="BtnStart" Content="▶ 开始多节点监控" Width="160" Height="35" Margin="0,0,15,0" Click="BtnStart_Click"/>
+                    <Button x:Name="BtnStop" Content="⏹ 停止监控" Width="140" Height="35" IsEnabled="False" Click="BtnStop_Click"/>
+                </StackPanel>
+
+                <lvc:CartesianChart Grid.Row="2" x:Name="SpeedChart" Hoverable="True" LegendLocation="Right">
+                    <lvc:CartesianChart.AxisX>
+                        <lvc:Axis Title="时间 (秒)"></lvc:Axis>
+                    </lvc:CartesianChart.AxisX>
+                    <lvc:CartesianChart.AxisY>
+                        <lvc:Axis Title="延迟 (ms)" MinValue="0" LabelFormatter="{Binding YFormatter}"></lvc:Axis>
+                    </lvc:CartesianChart.AxisY>
+                </lvc:CartesianChart>
+
+            </Grid>
+        </Border>
+    </Grid>
+</UserControl>

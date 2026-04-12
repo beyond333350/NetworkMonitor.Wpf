@@ -1,0 +1,27 @@
+﻿using System.Windows;
+
+namespace NetworkMonitor.Wpf
+{
+    public partial class MainWindow : Window
+    {
+        private HomeView _homeView;
+        private MonitorView _monitorView;
+        private TraceView _traceView;
+
+        public MainWindow()
+        {
+            InitializeComponent();
+
+            _homeView = new HomeView();
+            _monitorView = new MonitorView();
+            _traceView = new TraceView();
+
+            // 默认加载主页
+            MainContent.Content = _homeView;
+        }
+
+        private void BtnNavHome_Click(object sender, RoutedEventArgs e) => MainContent.Content = _homeView;
+        private void BtnNavMonitor_Click(object sender, RoutedEventArgs e) => MainContent.Content = _monitorView;
+        private void BtnNavTrace_Click(object sender, RoutedEventArgs e) => MainContent.Content = _traceView;
+    }
+}

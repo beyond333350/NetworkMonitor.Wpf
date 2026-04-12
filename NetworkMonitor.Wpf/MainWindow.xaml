@@ -1,0 +1,28 @@
+﻿<Window x:Class="NetworkMonitor.Wpf.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="网络监控工具箱" Height="750" Width="1200"
+        WindowState="Maximized" 
+        Background="#1E1E1E" 
+        Foreground="#D4D4D4"
+        WindowStartupLocation="CenterScreen">
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="220"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <Border Grid.Column="0" Background="#252526">
+            <StackPanel Margin="0,30,0,0">
+                <TextBlock Text="NetworkMonitor" FontSize="24" FontWeight="Bold" Foreground="White" HorizontalAlignment="Center" Margin="0,0,0,40"/>
+                
+                <Button x:Name="BtnNavHome" Content="🏠 主页" Margin="15,5" Height="50" FontSize="16" Click="BtnNavHome_Click"/>
+                <Button x:Name="BtnNavMonitor" Content="📊 监控面板" Margin="15,5" Height="50" FontSize="16" Click="BtnNavMonitor_Click"/>
+                <Button x:Name="BtnNavTrace" Content="📍 路由跟踪" Margin="15,5" Height="50" FontSize="16" Click="BtnNavTrace_Click"/>
+            </StackPanel>
+        </Border>
+
+        <ContentControl x:Name="MainContent" Grid.Column="1" Margin="10"/>
+    </Grid>
+</Window>
